@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Registros de Peso - Control de Salud</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #1a1a1a;
+      color: #ffffff;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    
+    /* Header Principal */
+    .main-header {
+      background: #2c2c2c;
+      padding: 15px 0;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+    }
+    
+    .header-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
+    }
+    
+    .logo-section {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+    
+    .logo {
+      width: 50px;
+      height: 50px;
+      background: linear-gradient(135deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      font-weight: bold;
+      color: white;
+    }
+    
+    .logo-text h1 {
+      font-size: 1.5em;
+      font-weight: bold;
+      color: #ffffff;
+    }
+    
+    .logo-text p {
+      font-size: 0.8em;
+      color: #cccccc;
+    }
+    
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+    
+    .search-bar {
+      position: relative;
+    }
+    
+    .search-bar input {
+      background: #3a3a3a;
+      border: none;
+      padding: 10px 15px 10px 40px;
+      border-radius: 25px;
+      color: white;
+      width: 250px;
+    }
+    
+    .search-bar i {
+      position: absolute;
+      left: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #888;
+    }
+    
+    .header-buttons {
+      display: flex;
+      gap: 10px;
+    }
+    
+    .btn-header {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 25px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    
+    .btn-primary {
+      background: #ff6b6b;
+      color: white;
+    }
+    
+    .btn-secondary {
+      background: #4ecdc4;
+      color: white;
+    }
+    
+    .btn-header:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    }
+    
+    /* Navegación Secundaria */
+    .secondary-nav {
+      background: #333333;
+      padding: 10px 0;
+    }
+    
+    .nav-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: center;
+      gap: 30px;
+      padding: 0 20px;
+    }
+    
+    .nav-item {
+      color: #cccccc;
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.3s;
+      position: relative;
+    }
+    
+    .nav-item:hover {
+      color: #4ecdc4;
+    }
+    
+    .nav-item::after {
+      content: '▼';
+      margin-left: 5px;
+      font-size: 0.7em;
+    }
+    
+    /* Sidebar Social */
+    .social-sidebar {
+      position: fixed;
+      left: 20px;
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      z-index: 100;
+    }
+    
+    .social-btn {
+      width: 50px;
+      height: 50px;
+      background: #4ecdc4;
+      border: none;
+      border-radius: 10px;
+      color: white;
+      font-size: 20px;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .social-btn:hover {
+      transform: scale(1.1);
+      background: #45b7d1;
+    }
+    
+    /* Contenido Principal */
+    .main-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 40px 20px;
+    }
+    
+    /* Hero Section */
+    .hero-section {
+      background: linear-gradient(135deg, #2c2c2c 0%, #1a1a1a 100%);
+      border-radius: 20px;
+      padding: 60px 40px;
+      text-align: center;
+      margin-bottom: 40px;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .hero-content h1 {
+      font-size: 3em;
+      font-weight: bold;
+      margin-bottom: 20px;
+      background: linear-gradient(135deg, #4ecdc4, #45b7d1);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    .hero-content p {
+      font-size: 1.2em;
+      color: #cccccc;
+      margin-bottom: 30px;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    
+    .hero-cta {
+      background: linear-gradient(135deg, #4ecdc4, #45b7d1);
+      color: white;
+      border: none;
+      padding: 15px 30px;
+      border-radius: 30px;
+      font-size: 1.1em;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    
+    .hero-cta:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 25px rgba(78, 205, 196, 0.3);
+    }
+    
+    /* Sección de Formulario */
+    .form-section {
+      background: #2c2c2c;
+      border-radius: 20px;
+      padding: 40px;
+      margin-bottom: 40px;
+    }
+    
+    .section-title {
+      font-size: 2em;
+      font-weight: bold;
+      margin-bottom: 30px;
+      text-align: center;
+      color: #4ecdc4;
+    }
+    
+    .form-group {
+      display: flex;
+      gap: 20px;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    
+    .form-group label {
+      font-weight: bold;
+      color: #ffffff;
+      font-size: 1.1em;
+    }
+    
+    .form-group input {
+      background: #3a3a3a;
+      border: 2px solid #555;
+      padding: 15px 20px;
+      border-radius: 10px;
+      font-size: 16px;
+      width: 250px;
+      color: white;
+      transition: all 0.3s;
+    }
+    
+    .form-group input:focus {
+      outline: none;
+      border-color: #4ecdc4;
+      box-shadow: 0 0 10px rgba(78, 205, 196, 0.3);
+    }
+    
+    .btn {
+      background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+      color: white;
+      border: none;
+      padding: 15px 30px;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(255, 107, 107, 0.3);
+    }
+    
+    /* Sección de Datos */
+    .data-section {
+      background: #2c2c2c;
+      border-radius: 20px;
+      padding: 40px;
+    }
+    
+    .data-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+    }
+    
+    .data-header h2 {
+      color: #4ecdc4;
+      font-size: 2em;
+    }
+    
+    .btn-refresh {
+      background: linear-gradient(135deg, #96ceb4, #4ecdc4);
+      color: white;
+      border: none;
+      padding: 12px 25px;
+      border-radius: 25px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    
+    .btn-refresh:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(150, 206, 180, 0.3);
+    }
+    
+    .table-container {
+      overflow-x: auto;
+      border-radius: 15px;
+      overflow: hidden;
+    }
+    
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #3a3a3a;
+    }
+    
+    th, td {
+      padding: 20px;
+      text-align: left;
+      border-bottom: 1px solid #555;
+    }
+    
+    th {
+      background: linear-gradient(135deg, #4ecdc4, #45b7d1);
+      color: white;
+      font-weight: bold;
+      font-size: 1.1em;
+    }
+    
+    tr:hover {
+      background-color: #444;
+    }
+    
+    td {
+      color: #ffffff;
+    }
+    
+    .no-data {
+      text-align: center;
+      color: #888;
+      font-style: italic;
+      padding: 60px;
+      background: #3a3a3a;
+      border-radius: 15px;
+    }
+    
+    .message {
+      padding: 20px;
+      margin: 20px 0;
+      border-radius: 15px;
+      text-align: center;
+      font-weight: bold;
+      font-size: 1.1em;
+    }
+    
+    .success {
+      background: linear-gradient(135deg, #96ceb4, #4ecdc4);
+      color: white;
+    }
+    
+    .error {
+      background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+      color: white;
+    }
+    
+    /* Sidebar de Acciones */
+    .action-sidebar {
+      position: fixed;
+      right: 20px;
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      z-index: 100;
+    }
+    
+    .action-btn {
+      width: 200px;
+      padding: 15px 20px;
+      border: none;
+      border-radius: 15px;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .action-btn:hover {
+      transform: translateX(-5px);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    }
+    
+    .action-btn.primary { background: linear-gradient(135deg, #4ecdc4, #45b7d1); }
+    .action-btn.secondary { background: linear-gradient(135deg, #ff6b6b, #ee5a24); }
+    .action-btn.tertiary { background: linear-gradient(135deg, #96ceb4, #4ecdc4); }
+    .action-btn.quaternary { background: linear-gradient(135deg, #feca57, #ff9ff3); }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+      .header-content {
+        flex-direction: column;
+        gap: 20px;
+      }
+      
+      .search-bar input {
+        width: 200px;
+      }
+      
+      .nav-content {
+        flex-wrap: wrap;
+        gap: 15px;
+      }
+      
+      .social-sidebar,
+      .action-sidebar {
+        display: none;
+      }
+      
+      .hero-content h1 {
+        font-size: 2em;
+      }
+      
+      .form-group {
+        flex-direction: column;
+      }
+      
+      .form-group input {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header Principal -->
+  <header class="main-header">
+    <div class="header-content">
+      <div class="logo-section">
+        <div class="logo">⚖️</div>
+        <div class="logo-text">
+          <h1>Control de Peso</h1>
+          <p>Salud y Bienestar</p>
+        </div>
+      </div>
+      
+      <div class="header-actions">
+        <div class="search-bar">
+          <i class="fas fa-search"></i>
+          <input type="text" placeholder="Buscar registros...">
+        </div>
+        
+        <div class="header-buttons">
+          <button class="btn-header btn-secondary">📊 Estadísticas</button>
+          <button class="btn-header btn-primary">📱 App Móvil</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Navegación Secundaria -->
+  <nav class="secondary-nav">
+    <div class="nav-content">
+      <a href="#" class="nav-item">REGISTROS</a>
+      <a href="#" class="nav-item">ESTADÍSTICAS</a>
+      <a href="#" class="nav-item">METAS</a>
+      <a href="#" class="nav-item">HISTORIAL</a>
+      <a href="#" class="nav-item">CONFIGURACIÓN</a>
+      <a href="#" class="nav-item">AYUDA</a>
+    </div>
+  </nav>
+
+  <!-- Sidebar Social -->
+  <div class="social-sidebar">
+    <button class="social-btn" title="Facebook"><i class="fab fa-facebook-f"></i></button>
+    <button class="social-btn" title="Instagram"><i class="fab fa-instagram"></i></button>
+    <button class="social-btn" title="Twitter"><i class="fab fa-twitter"></i></button>
+    <button class="social-btn" title="YouTube"><i class="fab fa-youtube"></i></button>
+    <button class="social-btn" title="LinkedIn"><i class="fab fa-linkedin-in"></i></button>
+  </div>
+
+  <!-- Contenido Principal -->
+  <main class="main-content">
+    <!-- Hero Section -->
+    <section class="hero-section">
+      <div class="hero-content">
+        <h1>¡Controla tu peso de manera inteligente!</h1>
+        <p>Registra, analiza y alcanza tus objetivos de salud con nuestra plataforma moderna y fácil de usar.</p>
+        <button class="hero-cta" onclick="document.getElementById('pesoForm').scrollIntoView()">
+          🚀 Comenzar ahora
+        </button>
+        <p id="horaActual" style="margin-top: 20px; font-size: 0.9em; opacity: 0.8;">
+          🕐 Hora actual de Colombia: <span id="horaColombia"></span>
+        </p>
+      </div>
+    </section>
+
+    <!-- Sección de Formulario -->
+    <section class="form-section">
+      <h2 class="section-title">📝 Agregar Nuevo Registro</h2>
+      <form id="pesoForm">
+        <div class="form-group">
+          <label for="peso">Peso (gramos):</label>
+          <input type="number" id="peso" name="peso" step="1" min="0" max="500000" required placeholder="Ej: 70000">
+          <button type="submit" class="btn">➕ Agregar Registro</button>
+        </div>
+      </form>
+      <div id="message"></div>
+    </section>
+
+    <!-- Sección de Datos -->
+    <section class="data-section">
+      <div class="data-header">
+        <h2>📊 Historial de Registros</h2>
+        <button id="refreshBtn" class="btn-refresh">
+          🔄 Actualizar
+        </button>
+      </div>
+      
+      <div class="table-container">
+        {% if registros %}
+        <table>
+          <thead>
+            <tr>
+              <th>📅 Fecha y Hora</th>
+              <th>⚖️ Peso (Gramos)</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for fecha, peso in registros %}
+            <tr>
+              <td>{{ fecha.strftime('%d/%m/%Y %H:%M') if fecha else 'N/A' }}</td>
+              <td><strong>{{ "%.0f"|format(peso) if peso else 'N/A' }} g</strong></td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        {% else %}
+        <div class="no-data">
+          <h3>📝 No hay registros aún</h3>
+          <p>Agrega tu primer registro de peso usando el formulario de arriba</p>
+        </div>
+        {% endif %}
+      </div>
+    </section>
+  </main>
+
+  <!-- Sidebar de Acciones -->
+  <div class="action-sidebar">
+    <button class="action-btn primary">
+      <i class="fas fa-chart-line"></i>
+      Ver Estadísticas
+    </button>
+    <button class="action-btn secondary">
+      <i class="fas fa-target"></i>
+      Establecer Meta
+    </button>
+    <button class="action-btn tertiary">
+      <i class="fas fa-download"></i>
+      Exportar Datos
+    </button>
+    <button class="action-btn quaternary">
+      <i class="fas fa-question-circle"></i>
+      Ayuda
+    </button>
+  </div>
+
+  <script>
+    // Función para mostrar la hora actual de Colombia
+    function actualizarHoraColombia() {
+      const ahora = new Date();
+      const horaColombia = ahora.toLocaleString('es-CO', {
+        timeZone: 'America/Bogota',
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+      });
+      document.getElementById('horaColombia').textContent = horaColombia;
+    }
+
+    // Actualizar la hora cada segundo
+    actualizarHoraColombia();
+    setInterval(actualizarHoraColombia, 1000);
+
+    document.getElementById('pesoForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      
+      const peso = document.getElementById('peso').value;
+      const messageDiv = document.getElementById('message');
+      
+      if (!peso || peso <= 0) {
+        showMessage('Por favor ingresa un peso válido', 'error');
+        return;
+      }
+      
+      try {
+        const response = await fetch('/insertar', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ peso: parseFloat(peso) })
+        });
+        
+        if (response.ok) {
+          showMessage('✅ Registro agregado exitosamente', 'success');
+          document.getElementById('peso').value = '';
+          // Actualizar la tabla automáticamente después de agregar
+          setTimeout(() => {
+            actualizarTabla();
+          }, 500);
+        } else {
+          showMessage('❌ Error al agregar el registro', 'error');
+        }
+      } catch (error) {
+        showMessage('❌ Error de conexión', 'error');
+        console.error('Error:', error);
+      }
+    });
+
+    // Funcionalidad del botón de actualizar
+    document.getElementById('refreshBtn').addEventListener('click', function() {
+      actualizarTabla();
+    });
+
+    // Función para actualizar la tabla sin recargar la página
+    async function actualizarTabla() {
+      const refreshBtn = document.getElementById('refreshBtn');
+      const originalText = refreshBtn.innerHTML;
+      
+      // Mostrar indicador de carga
+      refreshBtn.innerHTML = '⏳ Cargando...';
+      refreshBtn.disabled = true;
+      
+      try {
+        const response = await fetch('/api/registros');
+        const registros = await response.json();
+        
+        // Actualizar la tabla
+        actualizarTablaHTML(registros);
+        
+        // Mostrar mensaje de éxito
+        showMessage('✅ Datos actualizados correctamente', 'success');
+        
+      } catch (error) {
+        showMessage('❌ Error al actualizar los datos', 'error');
+        console.error('Error:', error);
+      } finally {
+        // Restaurar el botón
+        refreshBtn.innerHTML = originalText;
+        refreshBtn.disabled = false;
+      }
+    }
+
+    // Función para actualizar el HTML de la tabla
+    function actualizarTablaHTML(registros) {
+      const tableContainer = document.querySelector('.table-container');
+      
+      if (registros.length === 0) {
+        tableContainer.innerHTML = `
+          <div class="no-data">
+            <h3>📝 No hay registros aún</h3>
+            <p>Agrega tu primer registro de peso usando el formulario de arriba</p>
+          </div>
+        `;
+        return;
+      }
+      
+      let tableHTML = `
+        <table>
+          <thead>
+            <tr>
+              <th>📅 Fecha y Hora</th>
+              <th>⚖️ Peso (kg)</th>
+            </tr>
+          </thead>
+          <tbody>
+      `;
+      
+      registros.forEach(registro => {
+        tableHTML += `
+          <tr>
+            <td>${registro.fecha}</td>
+            <td><strong>${Math.round(registro.peso)} g</strong></td>
+          </tr>
+        `;
+      });
+      
+      tableHTML += `
+          </tbody>
+        </table>
+      `;
+      
+      tableContainer.innerHTML = tableHTML;
+    }
+    
+    function showMessage(text, type) {
+      const messageDiv = document.getElementById('message');
+      messageDiv.textContent = text;
+      messageDiv.className = `message ${type}`;
+      
+      // Ocultar el mensaje después de 3 segundos
+      setTimeout(() => {
+        messageDiv.textContent = '';
+        messageDiv.className = '';
+      }, 3000);
+    }
+  </script>
+</body>
+</html>
