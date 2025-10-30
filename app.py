@@ -67,6 +67,57 @@ def obtener_registros():
     
     return jsonify(registros_json)
 
+@app.route('/api/indicadores', methods=['GET'])
+def indicadores_reduccion():
+    """Calcula indicadores simples de reducción con base en los registros.
+    - baseline: primer valor registrado (g)
+    - actual: último valor registrado (g)
+    - reduccion_g: baseline - actual (no negativo)
+    - reduccion_pct: porcentaje respecto al baseline
+    - co2_kg_ev: conversión simple de residuos evitados a kgCO2e
+    """
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute("SELECT peso_g FROM registros_peso ORDER BY id ASC")
+    rows = cur.fetchall()
+    conn.close()
+
+    if not rows:
+        return jsonify({
+            'baseline_g': 0,
+            'actual_g': 0,
+            'reduccion_g': 0,
+            'reduccion_pct': 0.0,
+            'co2_kg_ev': 0.0
+        })
+
+    valores = [float(r[0]) for r in rows if r[0] is not None]
+    if not valores:
+        return jsonify({
+            'baseline_g': 0,
+            'actual_g': 0,
+            'reduccion_g': 0,
+            'reduccion_pct': 0.0,
+            'co2_kg_ev': 0.0
+        })
+
+    baseline_g = valores[0]
+    actual_g = valores[-1]
+    reduccion_g = max(0.0, baseline_g - actual_g)
+    reduccion_pct = (reduccion_g / baseline_g * 100.0) if baseline_g > 0 else 0.0
+
+    # Factor simple de conversión residuos (kg) -> CO2e (kg). Ajustable.
+    CO2_FACTOR_KG_PER_KG = 1.2
+    co2_kg_ev = (reduccion_g / 1000.0) * CO2_FACTOR_KG_PER_KG
+
+    return jsonify({
+        'baseline_g': round(baseline_g, 0),
+        'actual_g': round(actual_g, 0),
+        'reduccion_g': round(reduccion_g, 0),
+        'reduccion_pct': round(reduccion_pct, 2),
+        'co2_kg_ev': round(co2_kg_ev, 2)
+    })
+
 @app.route('/test-hora')
 def test_hora():
     colombia_tz = timezone(timedelta(hours=-5))

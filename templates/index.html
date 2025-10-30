@@ -310,6 +310,27 @@
       border-radius: 20px;
       padding: 40px;
     }
+
+    /* Indicadores de reducción */
+    .kpi-section {
+      background: #2c2c2c;
+      border-radius: 20px;
+      padding: 30px;
+      margin-bottom: 40px;
+    }
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 15px;
+    }
+    .kpi-card {
+      background: #3a3a3a;
+      border-radius: 12px;
+      padding: 16px;
+      text-align: center;
+    }
+    .kpi-title { color: #cccccc; font-size: 0.9em; margin-bottom: 8px; }
+    .kpi-value { color: #ffffff; font-size: 1.4em; font-weight: bold; }
     
     .data-header {
       display: flex;
@@ -552,6 +573,37 @@
       </div>
     </section>
 
+    <!-- Indicadores de Totales (en base a los registros mostrados) -->
+    <section class="kpi-section">
+      <h2 class="section-title">♻️ Indicadores de Registros</h2>
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <div class="kpi-title">Total (g)</div>
+          <div id="kpi-total" class="kpi-value">-</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-title">Promedio (g)</div>
+          <div id="kpi-promedio" class="kpi-value">-</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-title">Mínimo (g)</div>
+          <div id="kpi-min" class="kpi-value">-</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-title">Máximo (g)</div>
+          <div id="kpi-max" class="kpi-value">-</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-title">Registros</div>
+          <div id="kpi-count" class="kpi-value">-</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-title">CO₂ evitado (kg)</div>
+          <div id="kpi-co2" class="kpi-value">-</div>
+        </div>
+      </div>
+    </section>
+
     
 
     <!-- Sección de Datos -->
@@ -658,6 +710,7 @@
     // Funcionalidad del botón de actualizar
     document.getElementById('refreshBtn').addEventListener('click', function() {
       actualizarTabla();
+      cargarIndicadores();
     });
 
     // Función para actualizar la tabla sin recargar la página
@@ -730,6 +783,41 @@
       
       tableContainer.innerHTML = tableHTML;
     }
+    
+    // Cargar KPIs basados en la tabla (últimos registros)
+    async function cargarIndicadores() {
+      try {
+        const resp = await fetch('/api/registros');
+        const registros = await resp.json();
+        const pesos = registros.map(r => Number(r.peso || 0));
+        const count = pesos.length;
+        const total = pesos.reduce((a,b)=>a+b, 0);
+        const promedio = count ? Math.round(total / count) : 0;
+        const min = count ? Math.min(...pesos) : 0;
+        const max = count ? Math.max(...pesos) : 0;
+        const CO2_FACTOR_KG_PER_KG = 1.2; // Ajustable
+        // Baseline local: el primer total observado se usa como referencia
+        const baselineKey = 'baseline_total_g';
+        let baselineTotal = Number(localStorage.getItem(baselineKey) || 'NaN');
+        if (!Number.isFinite(baselineTotal)) {
+          baselineTotal = total;
+          localStorage.setItem(baselineKey, String(baselineTotal));
+        }
+        const reduccionG = Math.max(0, baselineTotal - total);
+        const co2kg = (reduccionG / 1000) * CO2_FACTOR_KG_PER_KG;
+
+        document.getElementById('kpi-total').textContent = `${Math.round(total)} g`;
+        document.getElementById('kpi-promedio').textContent = `${promedio} g`;
+        document.getElementById('kpi-min').textContent = `${Math.round(min)} g`;
+        document.getElementById('kpi-max').textContent = `${Math.round(max)} g`;
+        document.getElementById('kpi-count').textContent = `${count}`;
+        const co2El = document.getElementById('kpi-co2');
+        if (co2El) co2El.textContent = `${co2kg.toFixed(2)} kg`;
+      } catch (e) {
+        console.error('Error KPIs', e);
+      }
+    }
+    cargarIndicadores();
     
     function showMessage(text, type) {
       const messageDiv = document.getElementById('message');
