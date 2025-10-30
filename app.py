@@ -2,7 +2,8 @@ from flask import Flask, request, render_template, jsonify
 import psycopg2
 from datetime import datetime, timezone, timedelta
 
-app = Flask(__name__)
+# Servir archivos estáticos desde la carpeta `src` (para imágenes, etc.)
+app = Flask(__name__, static_folder='src')
 
 # 🔐 URL de conexión Neon (reemplaza con la tuya)
 DB_URL = "postgresql://neondb_owner:npg_Gj8oXfSQmp3x@ep-solitary-rain-adsodwpc-pooler.c-2.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require"

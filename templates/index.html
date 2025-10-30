@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Registros de Peso - Control de Salud</title>
+  <title>Menos Residuos, Mas Conciencia</title>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
   <style>
     * {
@@ -48,14 +48,9 @@
     .logo {
       width: 50px;
       height: 50px;
-      background: linear-gradient(135deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4);
       border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 24px;
-      font-weight: bold;
-      color: white;
+      object-fit: cover;
+      display: block;
     }
     
     .logo-text h1 {
@@ -441,6 +436,29 @@
     .action-btn.tertiary { background: linear-gradient(135deg, #96ceb4, #4ecdc4); }
     .action-btn.quaternary { background: linear-gradient(135deg, #feca57, #ff9ff3); }
     
+    /* Botón flotante de ayuda (FAB) */
+    .help-fab {
+      position: fixed;
+      right: 20px;
+      bottom: 20px;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: #ff6b6b; /* rojo */
+      color: #ffffff;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      box-shadow: 0 6px 16px rgba(0,0,0,0.35);
+      cursor: pointer;
+      z-index: 1100;
+    }
+    .help-fab:hover {
+      transform: scale(1.05);
+    }
+    
     /* Responsive */
     @media (max-width: 768px) {
       .header-content {
@@ -481,10 +499,10 @@
   <header class="main-header">
     <div class="header-content">
       <div class="logo-section">
-        <div class="logo">⚖️</div>
+        <img class="logo" src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo Control de Peso">
         <div class="logo-text">
-          <h1>Control de Peso</h1>
-          <p>Salud y Bienestar</p>
+          <h1>Menos Residuos, Mas Conciencia</h1>
+          <p>Conciencia que transforma, residuos que desaparecen</p>
         </div>
       </div>
       
@@ -492,11 +510,6 @@
         <div class="search-bar">
           <i class="fas fa-search"></i>
           <input type="text" placeholder="Buscar registros...">
-        </div>
-        
-        <div class="header-buttons">
-          <button class="btn-header btn-secondary">📊 Estadísticas</button>
-          <button class="btn-header btn-primary">📱 App Móvil</button>
         </div>
       </div>
     </div>
@@ -528,10 +541,10 @@
     <!-- Hero Section -->
     <section class="hero-section">
       <div class="hero-content">
-        <h1>¡Controla tu peso de manera inteligente!</h1>
-        <p>Registra, analiza y alcanza tus objetivos de salud con nuestra plataforma moderna y fácil de usar.</p>
-        <button class="hero-cta" onclick="document.getElementById('pesoForm').scrollIntoView()">
-          🚀 Comenzar ahora
+        <h1>¡Bienvenido a la plataforma de reducción de residuos!</h1>
+        <p>Analiza los objetivos de la reduccion de residuos con nuestra plataforma moderna y fácil de usar.</p>
+        <button class="hero-cta" onclick="document.getElementById('historial').scrollIntoView({behavior: 'smooth'})">
+          Comenzar ahora
         </button>
         <p id="horaActual" style="margin-top: 20px; font-size: 0.9em; opacity: 0.8;">
           🕐 Hora actual de Colombia: <span id="horaColombia"></span>
@@ -539,21 +552,10 @@
       </div>
     </section>
 
-    <!-- Sección de Formulario -->
-    <section class="form-section">
-      <h2 class="section-title">📝 Agregar Nuevo Registro</h2>
-      <form id="pesoForm">
-        <div class="form-group">
-          <label for="peso">Peso (gramos):</label>
-          <input type="number" id="peso" name="peso" step="1" min="0" max="500000" required placeholder="Ej: 70000">
-          <button type="submit" class="btn">➕ Agregar Registro</button>
-        </div>
-      </form>
-      <div id="message"></div>
-    </section>
+    
 
     <!-- Sección de Datos -->
-    <section class="data-section">
+    <section id="historial" class="data-section">
       <div class="data-header">
         <h2>📊 Historial de Registros</h2>
         <button id="refreshBtn" class="btn-refresh">
@@ -589,25 +591,10 @@
     </section>
   </main>
 
-  <!-- Sidebar de Acciones -->
-  <div class="action-sidebar">
-    <button class="action-btn primary">
-      <i class="fas fa-chart-line"></i>
-      Ver Estadísticas
-    </button>
-    <button class="action-btn secondary">
-      <i class="fas fa-target"></i>
-      Establecer Meta
-    </button>
-    <button class="action-btn tertiary">
-      <i class="fas fa-download"></i>
-      Exportar Datos
-    </button>
-    <button class="action-btn quaternary">
-      <i class="fas fa-question-circle"></i>
-      Ayuda
-    </button>
-  </div>
+  <!-- Botón flotante de Ayuda -->
+  <button class="help-fab" title="Ayuda" aria-label="Ayuda">
+    <i class="fas fa-question"></i>
+  </button>
 
   <script>
     // Función para mostrar la hora actual de Colombia
@@ -629,41 +616,44 @@
     actualizarHoraColombia();
     setInterval(actualizarHoraColombia, 1000);
 
-    document.getElementById('pesoForm').addEventListener('submit', async function(e) {
-      e.preventDefault();
-      
-      const peso = document.getElementById('peso').value;
-      const messageDiv = document.getElementById('message');
-      
-      if (!peso || peso <= 0) {
-        showMessage('Por favor ingresa un peso válido', 'error');
-        return;
-      }
-      
-      try {
-        const response = await fetch('/insertar', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ peso: parseFloat(peso) })
-        });
+    const pesoForm = document.getElementById('pesoForm');
+    if (pesoForm) {
+      pesoForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
         
-        if (response.ok) {
-          showMessage('✅ Registro agregado exitosamente', 'success');
-          document.getElementById('peso').value = '';
-          // Actualizar la tabla automáticamente después de agregar
-          setTimeout(() => {
-            actualizarTabla();
-          }, 500);
-        } else {
-          showMessage('❌ Error al agregar el registro', 'error');
+        const peso = document.getElementById('peso').value;
+        const messageDiv = document.getElementById('message');
+        
+        if (!peso || peso <= 0) {
+          showMessage('Por favor ingresa un peso válido', 'error');
+          return;
         }
-      } catch (error) {
-        showMessage('❌ Error de conexión', 'error');
-        console.error('Error:', error);
-      }
-    });
+        
+        try {
+          const response = await fetch('/insertar', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ peso: parseFloat(peso) })
+          });
+          
+          if (response.ok) {
+            showMessage('✅ Registro agregado exitosamente', 'success');
+            document.getElementById('peso').value = '';
+            // Actualizar la tabla automáticamente después de agregar
+            setTimeout(() => {
+              actualizarTabla();
+            }, 500);
+          } else {
+            showMessage('❌ Error al agregar el registro', 'error');
+          }
+        } catch (error) {
+          showMessage('❌ Error de conexión', 'error');
+          console.error('Error:', error);
+        }
+      });
+    }
 
     // Funcionalidad del botón de actualizar
     document.getElementById('refreshBtn').addEventListener('click', function() {
@@ -743,11 +733,13 @@
     
     function showMessage(text, type) {
       const messageDiv = document.getElementById('message');
+      if (!messageDiv) return; // Si no existe, no hacer nada
       messageDiv.textContent = text;
       messageDiv.className = `message ${type}`;
       
       // Ocultar el mensaje después de 3 segundos
       setTimeout(() => {
+        if (!messageDiv) return;
         messageDiv.textContent = '';
         messageDiv.className = '';
       }, 3000);
