@@ -287,6 +287,14 @@
       box-shadow: 0 0 10px rgba(78, 205, 196, 0.3);
     }
     
+    .form-group input:invalid {
+      border-color: #ff6b6b;
+    }
+    
+    .form-group input:valid {
+      border-color: #96ceb4;
+    }
+    
     .btn {
       background: linear-gradient(135deg, #ff6b6b, #ee5a24);
       color: white;
@@ -297,11 +305,20 @@
       font-weight: bold;
       cursor: pointer;
       transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
     
     .btn:hover {
       transform: translateY(-2px);
       box-shadow: 0 5px 15px rgba(255, 107, 107, 0.3);
+    }
+    
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
     }
     
     /* Sección de Datos */
@@ -604,7 +621,7 @@
       </div>
     </section>
 
-    
+
 
     <!-- Sección de Datos -->
     <section id="historial" class="data-section">
@@ -673,13 +690,19 @@
       pesoForm.addEventListener('submit', async function(e) {
         e.preventDefault();
         
-        const peso = document.getElementById('peso').value;
-        const messageDiv = document.getElementById('message');
+        const pesoInput = document.getElementById('peso');
+        const submitBtn = pesoForm.querySelector('button[type="submit"]');
+        const peso = pesoInput.value;
         
         if (!peso || peso <= 0) {
-          showMessage('Por favor ingresa un peso válido', 'error');
+          showMessage('⚠️ Por favor ingresa un peso válido mayor a 0', 'error');
+          pesoInput.focus();
           return;
         }
+        
+        // Deshabilitar el botón durante el envío
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...';
         
         try {
           const response = await fetch('/insertar', {
@@ -690,19 +713,30 @@
             body: JSON.stringify({ peso: parseFloat(peso) })
           });
           
+          const data = await response.json();
+          
           if (response.ok) {
-            showMessage('✅ Registro agregado exitosamente', 'success');
-            document.getElementById('peso').value = '';
-            // Actualizar la tabla automáticamente después de agregar
+            showMessage(`✅ Registro agregado exitosamente: ${Math.round(data.peso)}g`, 'success');
+            pesoInput.value = '';
+            pesoInput.focus();
+            
+            // Actualizar la tabla y los indicadores automáticamente
             setTimeout(() => {
               actualizarTabla();
+              cargarIndicadores();
             }, 500);
           } else {
-            showMessage('❌ Error al agregar el registro', 'error');
+            showMessage(`❌ ${data.error || 'Error al agregar el registro'}`, 'error');
+            pesoInput.focus();
           }
         } catch (error) {
-          showMessage('❌ Error de conexión', 'error');
+          showMessage('❌ Error de conexión. Verifica tu conexión a internet.', 'error');
           console.error('Error:', error);
+          pesoInput.focus();
+        } finally {
+          // Rehabilitar el botón
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = '<i class="fas fa-plus"></i> Agregar Registro';
         }
       });
     }
@@ -821,16 +855,37 @@
     
     function showMessage(text, type) {
       const messageDiv = document.getElementById('message');
-      if (!messageDiv) return; // Si no existe, no hacer nada
+      if (!messageDiv) {
+        // Crear el div si no existe
+        const formSection = document.querySelector('.form-section');
+        const newDiv = document.createElement('div');
+        newDiv.id = 'message';
+        formSection.appendChild(newDiv);
+        return showMessage(text, type);
+      }
       messageDiv.textContent = text;
       messageDiv.className = `message ${type}`;
+      messageDiv.style.display = 'block';
       
-      // Ocultar el mensaje después de 3 segundos
+      // Ocultar el mensaje después de 5 segundos
       setTimeout(() => {
-        if (!messageDiv) return;
-        messageDiv.textContent = '';
-        messageDiv.className = '';
-      }, 3000);
+        if (messageDiv) {
+          messageDiv.textContent = '';
+          messageDiv.className = '';
+          messageDiv.style.display = 'none';
+        }
+      }, 5000);
+    }
+    
+    // Mejorar la experiencia del formulario
+    const pesoInput = document.getElementById('peso');
+    if (pesoInput) {
+      pesoInput.addEventListener('input', function() {
+        const peso = parseFloat(this.value);
+        if (peso > 0) {
+          this.style.borderColor = '#96ceb4';
+        }
+      });
     }
   </script>
 </body>
