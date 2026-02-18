@@ -57,24 +57,6 @@ source venv/bin/activate  # En Windows: venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-### 4. Configurar variables de entorno
-
-Copia el archivo `.env.example` a `.env`:
-
-```bash
-cp .env.example .env
-```
-
-Edita el archivo `.env` y completa con tus credenciales:
-
-```env
-DATABASE_URL=postgresql://usuario:contraseña@host:puerto/nombre_bd?sslmode=require&channel_binding=require
-FLASK_ENV=development
-FLASK_DEBUG=True
-FLASK_SECRET_KEY=tu-clave-secreta-aqui-genera-una-aleatoria
-PORT=5000
-```
-
 
 ### 5. Crear la tabla en la base de datos
 
